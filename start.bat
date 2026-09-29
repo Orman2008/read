@@ -1,9 +1,7 @@
 @echo off
 cd /d "%~dp0"
-echo.
-echo Comic Voice Reader
+echo Comic Voice Reader v3
 echo Open: http://localhost:8000
-echo.
 where py >nul 2>&1
 if %errorlevel%==0 (
   start "" "http://localhost:8000"
@@ -16,6 +14,5 @@ if %errorlevel%==0 (
   python -m http.server 8000
   exit /b
 )
-echo Python ne nayden.
-echo Ustanovi Python ili zapusti komandu: py -m http.server 8000
+echo Python not found.
 pause

@@ -1,140 +1,108 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Comic Voice Reader</title>
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-  <style>
-    :root{
-      --bg:#0b0d12; --panel:#141925; --panel2:#1b2231; --text:#f6f7fb;
-      --muted:#98a2b3; --accent:#7ee7b5; --danger:#ff858f; --line:rgba(255,255,255,.09)
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;background:linear-gradient(180deg,#0b0d12,#0e1118);color:var(--text);
-      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
-    }
-    button,input,select,textarea{font:inherit}
-    .app{width:min(1200px,calc(100% - 24px));margin:0 auto;padding:20px 0 40px}
-    .top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:16px}
-    h1{font-size:clamp(26px,4vw,42px);margin:0 0 7px;letter-spacing:-.04em}
-    .sub{margin:0;color:var(--muted);line-height:1.45;max-width:760px}
-    .grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(330px,.75fr);gap:16px}
-    .card{background:var(--panel);border:1px solid var(--line);border-radius:22px;overflow:hidden}
-    .viewer{min-height:680px;display:flex;flex-direction:column}
-    .drop{
-      flex:1;min-height:500px;background:#07090d;display:grid;place-items:center;position:relative;
-      border:2px dashed transparent;transition:.15s ease;overflow:hidden
-    }
-    .drop.drag{border-color:var(--accent);background:#0c1511}
-    .drop img{display:none;width:100%;height:100%;max-height:690px;object-fit:contain}
-    .empty{text-align:center;color:var(--muted);padding:35px;max-width:520px}
-    .empty b{display:block;color:var(--text);font-size:21px;margin-bottom:8px}
-    .uploadBtn,.btn{
-      min-height:46px;border:1px solid var(--line);border-radius:14px;padding:0 16px;
-      color:var(--text);background:var(--panel2);cursor:pointer
-    }
-    .uploadBtn{position:relative;background:var(--accent);color:#07120d;font-weight:800;display:inline-flex;align-items:center}
-    .uploadBtn input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
-    .toolbar{padding:13px;display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid var(--line)}
-    .toolbar .btn{min-width:105px}
-    .counter{color:var(--muted);font-variant-numeric:tabular-nums}
-    .thumbs{display:flex;gap:8px;overflow:auto;padding:10px 13px 14px;border-top:1px solid var(--line)}
-    .thumb{width:64px;height:64px;flex:0 0 auto;border:2px solid transparent;border-radius:12px;padding:0;overflow:hidden;background:#0a0d12}
-    .thumb.active{border-color:var(--accent)}
-    .thumb img{width:100%;height:100%;object-fit:cover}
-    .side .section{padding:16px;border-bottom:1px solid var(--line)}
-    .side .section:last-child{border-bottom:0}
-    .label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
-    .status{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:14px}
-    .dot{width:9px;height:9px;border-radius:50%;background:#5f6879}
-    .dot.on{background:var(--accent);box-shadow:0 0 0 6px rgba(126,231,181,.09)}
-    .progress{height:7px;background:#252c3a;border-radius:99px;overflow:hidden;margin-top:11px}
-    .progress>div{height:100%;width:0;background:var(--accent);transition:width .2s}
-    textarea{width:100%;min-height:230px;resize:vertical;border-radius:14px;border:1px solid var(--line);background:#0d1119;color:var(--text);padding:12px;line-height:1.5;outline:none}
-    .fields{display:grid;gap:12px}
-    .field{display:grid;gap:6px;color:var(--muted);font-size:13px}
-    select{background:#0d1119;border:1px solid var(--line);color:var(--text);padding:11px;border-radius:12px}
-    input[type=range]{width:100%}
-    .row{display:flex;justify-content:space-between;align-items:center;gap:12px;color:var(--muted);font-size:14px}
-    .actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
-    .primary{background:var(--accent);color:#07120d;border-color:transparent;font-weight:800}
-    .danger{background:rgba(255,133,143,.1);color:#ffd7db}
-    .voiceHelp{font-size:12px;line-height:1.45;color:var(--muted);margin-top:8px}
-    .ocrBadge{position:absolute;top:14px;left:14px;background:rgba(0,0,0,.68);padding:7px 10px;border-radius:999px;font-size:12px;display:none}
-    .unsupported{display:none;margin-top:8px;color:#ffd0d4;font-size:13px}
-    @media(max-width:860px){
-      .top{flex-direction:column}.uploadBtn{width:100%;justify-content:center}.grid{grid-template-columns:1fr}
-      .viewer{min-height:auto}.drop{min-height:440px}
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Comic Voice Reader — RU bubbles only</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+:root{
+  --bg:#0b0d12;--panel:#141925;--panel2:#1d2433;--text:#f6f7fb;
+  --muted:#99a2b2;--accent:#7ee7b5;--danger:#ff8993;--line:rgba(255,255,255,.09)
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#0b0d12,#0f131b);color:var(--text);
+font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select,textarea{font:inherit}
+.app{width:min(1220px,calc(100% - 22px));margin:auto;padding:20px 0 42px}
+.top{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;margin-bottom:15px}
+h1{margin:0 0 7px;font-size:clamp(25px,4vw,40px);letter-spacing:-.04em}
+.sub{margin:0;color:var(--muted);line-height:1.5;max-width:780px}
+.upload{position:relative;display:inline-flex;align-items:center;justify-content:center;min-height:46px;
+padding:0 16px;border-radius:14px;background:var(--accent);color:#06130d;font-weight:850;white-space:nowrap}
+.upload input{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer}
+.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(330px,.75fr);gap:15px}
+.card{border:1px solid var(--line);background:var(--panel);border-radius:22px;overflow:hidden}
+.viewer{display:flex;flex-direction:column;min-height:700px}
+.stage{position:relative;display:grid;place-items:center;flex:1;min-height:520px;background:#07090d;overflow:hidden}
+.stage img{width:100%;height:100%;max-height:730px;object-fit:contain;display:none}
+.empty{text-align:center;color:var(--muted);max-width:520px;padding:34px;line-height:1.5}
+.empty strong{display:block;color:var(--text);font-size:20px;margin-bottom:7px}
+.badge{position:absolute;left:13px;top:13px;background:rgba(0,0,0,.72);padding:7px 10px;border-radius:999px;
+font-size:12px;display:none}
+.nav{border-top:1px solid var(--line);padding:12px;display:flex;align-items:center;justify-content:space-between;gap:9px}
+.btn{min-height:44px;border:1px solid var(--line);border-radius:13px;padding:0 14px;background:var(--panel2);color:var(--text);cursor:pointer}
+.btn:disabled{opacity:.35;cursor:not-allowed}.primary{background:var(--accent);color:#07120d;border-color:transparent;font-weight:850}
+.danger{color:#ffd9dc;background:rgba(255,137,147,.09)}.counter{color:var(--muted)}
+.thumbs{display:flex;gap:8px;overflow-x:auto;border-top:1px solid var(--line);padding:10px 12px 13px}
+.thumb{width:62px;height:62px;flex:0 0 auto;padding:0;border:2px solid transparent;border-radius:11px;overflow:hidden;background:#080b10}
+.thumb.active{border-color:var(--accent)}.thumb img{width:100%;height:100%;object-fit:cover}
+.section{padding:16px;border-bottom:1px solid var(--line)}.section:last-child{border-bottom:0}
+.label{font-size:12px;text-transform:uppercase;font-weight:850;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
+.status{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:14px}.dot{width:9px;height:9px;border-radius:50%;background:#606979}
+.dot.on{background:var(--accent);box-shadow:0 0 0 6px rgba(126,231,181,.08)}
+.progress{height:7px;background:#252c3b;border-radius:99px;overflow:hidden;margin-top:11px}.progress>div{height:100%;width:0;background:var(--accent)}
+textarea{width:100%;min-height:250px;background:#0d1119;border:1px solid var(--line);border-radius:14px;color:var(--text);padding:12px;line-height:1.55;resize:vertical;outline:none}
+.fields{display:grid;gap:11px}.field{display:grid;gap:6px;color:var(--muted);font-size:13px}
+select{background:#0d1119;border:1px solid var(--line);color:var(--text);border-radius:12px;padding:10px}
+input[type=range]{width:100%}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.note{margin-top:9px;color:var(--muted);font-size:12px;line-height:1.45}
+.rule{margin-top:10px;padding:10px;border-radius:12px;background:#0d1119;color:#c6cedb;font-size:12px;line-height:1.5}
+@media(max-width:880px){.top{flex-direction:column}.upload{width:100%}.grid{grid-template-columns:1fr}.viewer{min-height:auto}.stage{min-height:450px}}
+</style>
 </head>
 <body>
 <main class="app">
   <div class="top">
     <div>
       <h1>Comic Voice Reader</h1>
-      <p class="sub">Загружает страницы комикса, распознаёт текст из облачков, читает его вслух и автоматически переходит к следующей странице.</p>
+      <p class="sub">Читает только русские слова внутри светлых речевых облачков. Цифры, знаки и текст вне облачков отбрасываются. После чтения страница переключается автоматически.</p>
     </div>
-    <label class="uploadBtn">+ Выбрать страницы<input id="files" type="file" accept="image/*" multiple></label>
+    <label class="upload">+ Загрузить страницы<input id="files" type="file" accept="image/*" multiple></label>
   </div>
 
   <div class="grid">
     <section class="card viewer">
-      <div id="drop" class="drop">
+      <div class="stage" id="stage">
         <img id="page" alt="Страница комикса">
-        <div id="empty" class="empty">
-          <b>Добавь страницы комикса</b>
-          Нажми «Выбрать страницы» или перетащи изображения сюда.<br><br>
-          Поддерживаются JPG, PNG, WEBP и фотографии с камеры.
-        </div>
-        <div id="ocrBadge" class="ocrBadge">OCR</div>
+        <div class="empty" id="empty"><strong>Загрузи страницы комикса</strong>Выбери несколько JPG / PNG / WEBP. Порядок файлов станет порядком чтения.</div>
+        <div class="badge" id="badge">OCR</div>
       </div>
-
-      <div class="toolbar">
-        <button id="prev" class="btn">← Назад</button>
-        <div id="counter" class="counter">0 / 0</div>
-        <button id="next" class="btn">Дальше →</button>
+      <div class="nav">
+        <button class="btn" id="prev">← Назад</button>
+        <div class="counter" id="counter">0 / 0</div>
+        <button class="btn" id="next">Дальше →</button>
       </div>
-      <div id="thumbs" class="thumbs"></div>
+      <div class="thumbs" id="thumbs"></div>
     </section>
 
-    <aside class="card side">
+    <aside class="card">
       <div class="section">
         <div class="label">Состояние</div>
-        <div class="status"><span id="dot" class="dot"></span><span id="status">Ожидание страниц</span></div>
+        <div class="status"><span class="dot" id="dot"></span><span id="status">Ожидание страниц</span></div>
         <div class="progress"><div id="bar"></div></div>
       </div>
 
       <div class="section">
-        <div class="label">Текст страницы</div>
-        <textarea id="text" placeholder="После OCR текст появится здесь. Его можно исправить вручную перед чтением."></textarea>
+        <div class="label">Текст из облачков</div>
+        <textarea id="text" placeholder="Здесь появятся только русские слова из речевых облачков."></textarea>
+        <div class="rule">Фильтр: только А–Я / а–я / Ё / ё. Не читаются цифры, валюты, @, &, ?, !, кавычки, скобки, тире, двоеточия и остальные символы.</div>
       </div>
 
       <div class="section">
         <div class="label">Голос</div>
         <div class="fields">
           <label class="field">Голос<select id="voice"></select></label>
-          <label class="field">Мягкость / высота<input id="pitch" type="range" min="0.85" max="1.35" value="1.08" step="0.01"></label>
-          <label class="field">Скорость<input id="rate" type="range" min="0.65" max="1.15" value="0.90" step="0.01"></label>
-          <div class="row"><span>Автоматически читать после OCR</span><input id="autoRead" type="checkbox" checked></div>
-          <div class="row"><span>После чтения листать дальше</span><input id="autoNext" type="checkbox" checked></div>
+          <label class="field">Высота<input id="pitch" type="range" min=".85" max="1.30" value="1.07" step=".01"></label>
+          <label class="field">Скорость<input id="rate" type="range" min=".65" max="1.15" value=".90" step=".01"></label>
         </div>
-
         <div class="actions">
-          <button id="unlockVoice" class="btn primary">Включить голос</button>
-          <button id="read" class="btn">▶ Читать</button>
-          <button id="testVoice" class="btn">Тест голоса</button>
-          <button id="stop" class="btn danger">■ Стоп</button>
+          <button class="btn primary" id="start">▶ Начать комикс</button>
+          <button class="btn" id="read">Читать страницу</button>
+          <button class="btn" id="test">Тест голоса</button>
+          <button class="btn danger" id="stop">■ Стоп</button>
         </div>
-
-        <div id="voiceUnsupported" class="unsupported">
-          Этот браузер не даёт доступ к системному голосу. Открой сайт в Chrome, Edge или Safari.
-        </div>
-        <div class="voiceHelp">
-          Для максимально нежного звучания поставь скорость 0.85–0.95 и высоту 1.03–1.12. Конкретный голос зависит от голосов, установленных в системе.
-        </div>
+        <div class="note">Нажми «Начать комикс» один раз. Это активирует голос в Safari/Chrome и запускает непрерывный режим: OCR → чтение → следующая страница.</div>
       </div>
     </aside>
   </div>
@@ -142,118 +110,81 @@
 
 <script>
 (() => {
-  const $ = id => document.getElementById(id);
-  const filesEl=$('files'), page=$('page'), empty=$('empty'), drop=$('drop'), thumbs=$('thumbs');
-  const prev=$('prev'), next=$('next'), counter=$('counter'), text=$('text');
-  const status=$('status'), dot=$('dot'), bar=$('bar'), badge=$('ocrBadge');
-  const voice=$('voice'), pitch=$('pitch'), rate=$('rate'), autoRead=$('autoRead'), autoNext=$('autoNext');
-  const unlockVoice=$('unlockVoice'), readBtn=$('read'), testVoice=$('testVoice'), stopBtn=$('stop');
-  const unsupported=$('voiceUnsupported');
+  const $=id=>document.getElementById(id);
+  const filesEl=$('files'),page=$('page'),empty=$('empty'),stage=$('stage'),thumbs=$('thumbs');
+  const prev=$('prev'),next=$('next'),counter=$('counter'),badge=$('badge');
+  const text=$('text'),status=$('status'),dot=$('dot'),bar=$('bar');
+  const voiceSel=$('voice'),pitch=$('pitch'),rate=$('rate');
+  const startBtn=$('start'),readBtn=$('read'),testBtn=$('test'),stopBtn=$('stop');
 
-  let items=[], index=0, token=0, voiceUnlocked=false, speakingSession=0;
+  let pages=[],current=0,ocrToken=0,speechToken=0,continuous=false,worker=null;
+  const speechOK='speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
 
-  const speechSupported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
-  unsupported.style.display = speechSupported ? 'none' : 'block';
+  const CYR = /[А-ЯЁа-яё]+/g;
+  const CYR_FULL = /^[А-ЯЁа-яё]+$/;
 
-  function setStatus(msg, active=false){
-    status.textContent=msg; dot.classList.toggle('on',active);
-  }
-  function setProgress(v){ bar.style.width = Math.max(0,Math.min(100,v)) + '%'; }
+  function setStatus(s,on=false){status.textContent=s;dot.classList.toggle('on',on)}
+  function setProgress(v){bar.style.width=Math.max(0,Math.min(100,v))+'%'}
 
-  function cleanOCR(s){
-    return (s||'')
-      .replace(/\r/g,'')
-      .replace(/[ \t]+/g,' ')
-      .replace(/\n[ \t]+/g,'\n')
-      .replace(/\n{3,}/g,'\n\n')
-      .replace(/ ?([,.;!?…:]) ?/g,'$1 ')
-      .replace(/ {2,}/g,' ')
-      .trim();
-  }
-
-  function voices(){
-    return speechSupported ? speechSynthesis.getVoices() : [];
+  function cleanRussianOnly(s){
+    const words=(s||'').match(CYR)||[];
+    return words.join(' ').replace(/\s+/g,' ').trim();
   }
 
   function loadVoices(){
-    if(!speechSupported) return;
-    const vs=voices();
-    voice.innerHTML='';
+    if(!speechOK)return;
+    const vs=speechSynthesis.getVoices();
+    voiceSel.innerHTML='';
     const ru=vs.filter(v=>/^ru[-_]/i.test(v.lang));
-    const pool=ru.length?ru:vs;
-    const femaleHint=/milena|alena|elena|svetlana|irina|katya|female|жен|tatyana|victoria|xenia|yurianna/i;
-
-    pool.sort((a,b)=>Number(femaleHint.test(b.name))-Number(femaleHint.test(a.name)));
-    pool.forEach(v=>{
-      const o=document.createElement('option');
-      o.value=v.name; o.textContent=`${v.name} — ${v.lang}`;
-      voice.appendChild(o);
-    });
+    const pool=(ru.length?ru:vs).slice();
+    const hints=/milena|alena|elena|svetlana|irina|katya|tatyana|victoria|ксения|жен|female/i;
+    pool.sort((a,b)=>Number(hints.test(b.name))-Number(hints.test(a.name)));
+    for(const v of pool){
+      const o=document.createElement('option');o.value=v.name;o.textContent=`${v.name} — ${v.lang}`;
+      voiceSel.appendChild(o);
+    }
   }
-
-  if(speechSupported){
-    speechSynthesis.onvoiceschanged=loadVoices;
-    loadVoices();
-    setTimeout(loadVoices,300);
-    setTimeout(loadVoices,1200);
+  if(speechOK){
+    speechSynthesis.onvoiceschanged=loadVoices;loadVoices();setTimeout(loadVoices,300);setTimeout(loadVoices,1000);
   }
 
   function selectedVoice(){
-    const vs=voices();
-    return vs.find(v=>v.name===voice.value) ||
-           vs.find(v=>/^ru[-_]/i.test(v.lang)) ||
-           vs[0] || null;
+    const vs=speechOK?speechSynthesis.getVoices():[];
+    return vs.find(v=>v.name===voiceSel.value)||vs.find(v=>/^ru[-_]/i.test(v.lang))||vs[0]||null;
   }
 
-  function splitText(src,max=240){
-    const s=src.replace(/\s+/g,' ').trim();
-    if(!s) return [];
-    const units=s.match(/[^.!?…]+[.!?…]?/g)||[s];
-    const out=[]; let cur='';
-    for(const u of units){
-      const candidate=(cur+' '+u).trim();
-      if(candidate.length<=max){cur=candidate;continue;}
-      if(cur) out.push(cur);
-      if(u.length<=max){cur=u.trim();continue;}
-      const words=u.trim().split(/\s+/); cur='';
-      for(const w of words){
-        const t=(cur+' '+w).trim();
-        if(t.length>max && cur){out.push(cur);cur=w}else cur=t;
-      }
+  function splitSpeech(s,max=220){
+    const w=cleanRussianOnly(s).split(/\s+/).filter(Boolean);
+    const out=[];let cur='';
+    for(const word of w){
+      const c=(cur+' '+word).trim();
+      if(c.length>max&&cur){out.push(cur);cur=word}else cur=c;
     }
-    if(cur) out.push(cur);
+    if(cur)out.push(cur);
     return out;
   }
 
   function stopSpeech(){
-    speakingSession++;
-    if(speechSupported) speechSynthesis.cancel();
+    speechToken++;
+    if(speechOK)speechSynthesis.cancel();
   }
 
-  function speak(src, onDone){
-    if(!speechSupported){setStatus('Голос недоступен в этом браузере');return;}
-    const parts=splitText(src);
-    if(!parts.length){setStatus('Нет текста для чтения');return;}
-
+  function speak(s,done){
+    if(!speechOK){setStatus('В браузере нет голосового движка');return}
+    const chunks=splitSpeech(s);
+    if(!chunks.length){setStatus('На странице нет русского текста в облачках');if(done)done();return}
     stopSpeech();
-    const mySession=speakingSession;
+    const token= speechToken;
     const v=selectedVoice();
     let i=0;
     setStatus('Читаю страницу',true);
 
     const run=()=>{
-      if(mySession!==speakingSession) return;
-      if(i>=parts.length){
-        setStatus('Чтение завершено');
-        if(onDone) onDone();
-        return;
-      }
-      const u=new SpeechSynthesisUtterance(parts[i++]);
-      u.lang=v?.lang||'ru-RU';
-      if(v) u.voice=v;
-      u.pitch=Number(pitch.value);
-      u.rate=Number(rate.value);
-      u.volume=1;
+      if(token!==speechToken)return;
+      if(i>=chunks.length){setStatus('Страница прочитана');if(done)done();return}
+      const u=new SpeechSynthesisUtterance(chunks[i++]);
+      u.lang=v?.lang||'ru-RU'; if(v)u.voice=v;
+      u.pitch=Number(pitch.value);u.rate=Number(rate.value);u.volume=1;
       u.onend=run;
       u.onerror=()=>setStatus('Ошибка голосового движка');
       speechSynthesis.speak(u);
@@ -261,146 +192,237 @@
     run();
   }
 
-  function unlock(){
-    if(!speechSupported) return;
-    const u=new SpeechSynthesisUtterance('Голос включён');
-    const v=selectedVoice();
-    if(v){u.voice=v;u.lang=v.lang}
-    u.pitch=Number(pitch.value);
-    u.rate=Number(rate.value);
-    speechSynthesis.cancel();
-    speechSynthesis.speak(u);
-    voiceUnlocked=true;
-    unlockVoice.textContent='✓ Голос включён';
-    setStatus('Голос готов');
+  async function ensureWorker(){
+    if(worker)return worker;
+    setStatus('Загружаю русский OCR',true);
+    worker=await Tesseract.createWorker('rus',1,{
+      logger:m=>{
+        if(m.status==='recognizing text'){
+          const p=Math.round((m.progress||0)*100);setProgress(p);badge.textContent='OCR: '+p+'%';
+        }
+      }
+    });
+    await worker.setParameters({
+      tessedit_char_whitelist:'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя ',
+      tessedit_pageseg_mode:'11',
+      preserve_interword_spaces:'1'
+    });
+    return worker;
+  }
+
+  async function prepareImage(url){
+    const img=new Image();
+    await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url});
+    const maxW=1800;
+    const scale=Math.min(2, maxW/img.width || 1);
+    const c=document.createElement('canvas');
+    c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));
+    const ctx=c.getContext('2d',{willReadFrequently:true});
+    ctx.drawImage(img,0,0,c.width,c.height);
+    const original=ctx.getImageData(0,0,c.width,c.height);
+
+    // OCR canvas: grayscale + moderate contrast.
+    const o=document.createElement('canvas');o.width=c.width;o.height=c.height;
+    const oc=o.getContext('2d',{willReadFrequently:true});
+    const d=new ImageData(new Uint8ClampedArray(original.data),original.width,original.height);
+    for(let i=0;i<d.data.length;i+=4){
+      const g=.299*d.data[i]+.587*d.data[i+1]+.114*d.data[i+2];
+      const q=Math.max(0,Math.min(255,(g-128)*1.32+128));
+      d.data[i]=d.data[i+1]=d.data[i+2]=q;
+    }
+    oc.putImageData(d,0,0);
+    return {ocr:o.toDataURL('image/jpeg',.94),pixels:original,width:c.width,height:c.height};
+  }
+
+  // Проверяет, окружено ли OCR-слово светлым фоном речевого облачка.
+  function bubbleScore(word,prep){
+    const {left,top,width,height}=word;
+    const x0=Math.max(0,Math.floor(left-width*.55));
+    const y0=Math.max(0,Math.floor(top-height*.55));
+    const x1=Math.min(prep.width,Math.ceil(left+width*1.55));
+    const y1=Math.min(prep.height,Math.ceil(top+height*1.55));
+    const d=prep.pixels.data, W=prep.width;
+    let bright=0,total=0;
+
+    const step=Math.max(1,Math.floor(Math.min(width,height)/7));
+    for(let y=y0;y<y1;y+=step){
+      for(let x=x0;x<x1;x+=step){
+        // Не оцениваем центральную область букв.
+        if(x>=left && x<=left+width && y>=top && y<=top+height)continue;
+        const i=(y*W+x)*4;
+        const r=d[i],g=d[i+1],b=d[i+2];
+        const max=Math.max(r,g,b),min=Math.min(r,g,b);
+        const lum=.299*r+.587*g+.114*b;
+        // Белый / кремово-белый фон типичного speech bubble.
+        if(lum>210 && max-min<48)bright++;
+        total++;
+      }
+    }
+    return total?bright/total:0;
+  }
+
+  function parseTSV(tsv,prep){
+    if(!tsv)return '';
+    const rows=tsv.trim().split(/\r?\n/);
+    if(rows.length<2)return '';
+    const words=[];
+
+    for(let i=1;i<rows.length;i++){
+      const c=rows[i].split('\t');
+      if(c.length<12 || c[0]!=='5')continue;
+      const raw=c.slice(11).join('\t').trim();
+      const russian=cleanRussianOnly(raw);
+      if(!russian || !CYR_FULL.test(russian.replace(/\s+/g,'')))continue;
+
+      const conf=Number(c[10]);
+      if(!Number.isFinite(conf) || conf<30)continue;
+
+      const w={
+        block:Number(c[2]),par:Number(c[3]),line:Number(c[4]),
+        left:Number(c[6]),top:Number(c[7]),width:Number(c[8]),height:Number(c[9]),
+        conf,text:russian
+      };
+
+      const score=bubbleScore(w,prep);
+      // Достаточно строгий порог, чтобы убрать текст на фоне картинки.
+      if(score<0.43)continue;
+      words.push(w);
+    }
+
+    // Сохраняем порядок Tesseract; строки отделяем переносом.
+    const lines=[];
+    let key=null,buf=[];
+    for(const w of words){
+      const k=`${w.block}:${w.par}:${w.line}`;
+      if(key!==null && k!==key){
+        if(buf.length)lines.push(buf.join(' '));
+        buf=[];
+      }
+      key=k;buf.push(w.text);
+    }
+    if(buf.length)lines.push(buf.join(' '));
+
+    return lines.map(cleanRussianOnly).filter(Boolean).join('\n');
+  }
+
+  async function recognize(index){
+    const item=pages[index];if(!item)return;
+    if(item.text!==null){
+      text.value=item.text;setProgress(100);setStatus('Текст готов');
+      if(continuous)readAndAdvance();
+      return;
+    }
+
+    const my=++ocrToken;
+    stopSpeech();text.value='';setProgress(0);badge.style.display='block';badge.textContent='OCR: подготовка';
+    setStatus('Ищу русский текст в речевых облачках',true);
+
+    try{
+      const prep=await prepareImage(item.url);
+      if(my!==ocrToken)return;
+      const w=await ensureWorker();
+      const result=await w.recognize(prep.ocr,{}, {tsv:true,text:true});
+      if(my!==ocrToken)return;
+
+      const filtered=parseTSV(result.data.tsv,prep);
+      item.text=filtered;
+      text.value=filtered;
+      setProgress(100);badge.textContent='OCR: готово';
+      setTimeout(()=>{if(my===ocrToken)badge.style.display='none'},700);
+
+      if(filtered)setStatus('Текст в облачках найден');
+      else setStatus('Русского текста в облачках не найдено');
+
+      if(continuous)readAndAdvance();
+    }catch(e){
+      console.error(e);
+      if(my!==ocrToken)return;
+      badge.style.display='none';setProgress(0);
+      setStatus('OCR не запустился. Открой сайт через localhost и проверь интернет.');
+    }
+  }
+
+  function readAndAdvance(){
+    const s=cleanRussianOnly(text.value);
+    speak(s,()=>{
+      if(!continuous)return;
+      if(current<pages.length-1){
+        show(current+1);
+      }else{
+        continuous=false;
+        startBtn.textContent='▶ Начать комикс';
+        setStatus('Комикс прочитан');
+      }
+    });
   }
 
   function renderThumbs(){
     thumbs.innerHTML='';
-    items.forEach((it,i)=>{
-      const b=document.createElement('button');
-      b.className='thumb'+(i===index?' active':'');
-      const im=document.createElement('img'); im.src=it.url; im.alt=`Страница ${i+1}`;
-      b.appendChild(im); b.onclick=()=>show(i); thumbs.appendChild(b);
+    pages.forEach((p,i)=>{
+      const b=document.createElement('button');b.className='thumb'+(i===current?' active':'');
+      const im=document.createElement('img');im.src=p.url;im.alt=`Страница ${i+1}`;
+      b.appendChild(im);b.onclick=()=>{continuous=false;show(i)};thumbs.appendChild(b);
     });
   }
 
   function updateNav(){
-    counter.textContent=items.length?`${index+1} / ${items.length}`:'0 / 0';
-    prev.disabled=!items.length||index===0;
-    next.disabled=!items.length||index===items.length-1;
+    counter.textContent=pages.length?`${current+1} / ${pages.length}`:'0 / 0';
+    prev.disabled=!pages.length||current===0;next.disabled=!pages.length||current===pages.length-1;
   }
 
   function show(i){
-    if(!items.length) return;
-    stopSpeech(); token++;
-    index=Math.max(0,Math.min(i,items.length-1));
-    page.src=items[index].url; page.style.display='block'; empty.style.display='none';
-    text.value=items[index].text||'';
-    renderThumbs(); updateNav();
-    recognize();
+    if(!pages.length)return;
+    stopSpeech();ocrToken++;
+    current=Math.max(0,Math.min(i,pages.length-1));
+    page.src=pages[current].url;page.style.display='block';empty.style.display='none';
+    text.value=pages[current].text||'';renderThumbs();updateNav();recognize(current);
   }
 
-  async function preprocess(url){
-    const img=new Image();
-    await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=url});
-    const maxW=2200;
-    const scale=Math.min(2.0, maxW/img.width || 1);
-    const c=document.createElement('canvas');
-    c.width=Math.max(1,Math.round(img.width*scale));
-    c.height=Math.max(1,Math.round(img.height*scale));
-    const ctx=c.getContext('2d');
-    ctx.drawImage(img,0,0,c.width,c.height);
-    const d=ctx.getImageData(0,0,c.width,c.height);
-    const p=d.data;
-    for(let i=0;i<p.length;i+=4){
-      const g=0.299*p[i]+0.587*p[i+1]+0.114*p[i+2];
-      const cst=Math.max(0,Math.min(255,(g-128)*1.35+128));
-      p[i]=p[i+1]=p[i+2]=cst;
-    }
-    ctx.putImageData(d,0,0);
-    return c.toDataURL('image/jpeg',0.94);
-  }
-
-  async function recognize(){
-    const it=items[index]; if(!it) return;
-    if(it.text){
-      text.value=it.text; setProgress(100); setStatus('Текст готов');
-      if(autoRead.checked && voiceUnlocked) speak(it.text,()=>{ if(autoNext.checked && index<items.length-1) show(index+1); });
-      return;
-    }
-
-    const myToken=++token;
-    setProgress(0); badge.style.display='block'; badge.textContent='OCR: подготовка';
-    setStatus('Распознаю текст комикса',true);
-
-    try{
-      const src=await preprocess(it.url);
-      const result=await Tesseract.recognize(src,'rus+eng',{
-        logger:m=>{
-          if(myToken!==token) return;
-          if(m.status==='recognizing text'){
-            const pc=Math.round((m.progress||0)*100);
-            setProgress(pc); badge.textContent=`OCR: ${pc}%`;
-          } else if(m.status) badge.textContent='OCR: '+m.status;
-        }
-      });
-
-      if(myToken!==token) return;
-      const out=cleanOCR(result.data.text);
-      it.text=out; text.value=out;
-      setProgress(100); badge.textContent='OCR: готово';
-      setTimeout(()=>{if(myToken===token)badge.style.display='none'},900);
-
-      if(!out){setStatus('Текст не найден');return;}
-      setStatus('Текст распознан');
-
-      if(autoRead.checked && voiceUnlocked){
-        speak(out,()=>{ if(autoNext.checked && index<items.length-1) show(index+1); });
-      }
-    }catch(e){
-      console.error(e);
-      if(myToken!==token) return;
-      badge.style.display='none'; setProgress(0);
-      setStatus('OCR не запустился. Проверь интернет и запуск через localhost.');
-    }
-  }
-
-  function addFiles(fileList){
-    const files=[...fileList].filter(f=>f.type.startsWith('image/'));
-    if(!files.length){setStatus('Не выбраны изображения');return;}
-    stopSpeech();
-    items.forEach(x=>URL.revokeObjectURL(x.url));
-    items=files.map(f=>({file:f,url:URL.createObjectURL(f),text:''}));
-    index=0; show(0);
+  function addFiles(list){
+    const arr=[...list].filter(f=>f.type.startsWith('image/'));
+    if(!arr.length){setStatus('Выбери изображения');return}
+    pages.forEach(p=>URL.revokeObjectURL(p.url));
+    pages=arr.map(f=>({file:f,url:URL.createObjectURL(f),text:null}));
+    current=0;continuous=false;startBtn.textContent='▶ Начать комикс';show(0);
   }
 
   filesEl.addEventListener('change',e=>addFiles(e.target.files));
-  ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag')}));
-  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag')}));
-  drop.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+  prev.onclick=()=>{continuous=false;show(current-1)};
+  next.onclick=()=>{continuous=false;show(current+1)};
 
-  prev.onclick=()=>show(index-1);
-  next.onclick=()=>show(index+1);
-  unlockVoice.onclick=unlock;
-  readBtn.onclick=()=>speak(text.value,()=>{if(autoNext.checked&&index<items.length-1)show(index+1)});
-  testVoice.onclick=()=>speak('Привет. Это тест мягкого женского голоса для чтения комикса.');
-  stopBtn.onclick=()=>{stopSpeech();setStatus('Чтение остановлено')};
+  startBtn.onclick=()=>{
+    if(!pages.length){setStatus('Сначала загрузи страницы');return}
+    continuous=true;
+    startBtn.textContent='▶ Читаю автоматически';
+    // Пользовательский клик разблокирует SpeechSynthesis на мобильных.
+    if(speechOK){
+      const unlock=new SpeechSynthesisUtterance('Начинаю чтение');
+      const v=selectedVoice();if(v){unlock.voice=v;unlock.lang=v.lang}
+      unlock.volume=.01; unlock.rate=1.2;
+      unlock.onend=()=>{
+        const item=pages[current];
+        if(item.text!==null){text.value=item.text;readAndAdvance()}
+        else recognize(current);
+      };
+      speechSynthesis.cancel();speechSynthesis.speak(unlock);
+    }else{
+      setStatus('В браузере нет голосового движка');
+    }
+  };
 
-  let touchX=null;
-  drop.addEventListener('touchstart',e=>touchX=e.changedTouches[0].clientX,{passive:true});
-  drop.addEventListener('touchend',e=>{
-    if(touchX===null)return;
-    const dx=e.changedTouches[0].clientX-touchX; touchX=null;
-    if(Math.abs(dx)<50)return;
-    if(dx<0 && index<items.length-1) show(index+1);
-    if(dx>0 && index>0) show(index-1);
+  readBtn.onclick=()=>{continuous=false;speak(text.value)};
+  testBtn.onclick=()=>speak('Привет это тест нежного русского голоса');
+  stopBtn.onclick=()=>{continuous=false;stopSpeech();startBtn.textContent='▶ Начать комикс';setStatus('Остановлено')};
+
+  let sx=null;
+  stage.addEventListener('touchstart',e=>sx=e.changedTouches[0].clientX,{passive:true});
+  stage.addEventListener('touchend',e=>{
+    if(sx===null)return;const dx=e.changedTouches[0].clientX-sx;sx=null;
+    if(Math.abs(dx)<55)return;
+    continuous=false;
+    if(dx<0&&current<pages.length-1)show(current+1);
+    if(dx>0&&current>0)show(current-1);
   },{passive:true});
-
-  document.addEventListener('keydown',e=>{
-    if(e.key==='ArrowLeft'&&index>0)show(index-1);
-    if(e.key==='ArrowRight'&&index<items.length-1)show(index+1);
-  });
 
   updateNav();
 })();
